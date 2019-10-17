@@ -1,165 +1,89 @@
-import sys
-import serial
-import struct
+import binascii
+import sys,getopt
+import socket
+import numpy as np
 import time
+import struct
+import os
 import threading
+#import scipy.signal as signal
+import resources.variablesEMG as variablesEMG
 
-#import sensors
-if __name__== "__main__":
-    import sensors as sensors
-else:
-    import sensors as sensors
+#object to aquire and analyze the EMG delsys data
 
-import logging
-logging.basicConfig(level = logging.DEBUG, format = '[%(levelname)s] (%(threadName)-9s) %(message)s',)
-"""
-*********************************************************************************************
-*********************************************************************************************
-*** [EcgSensor] is an object that inherits from the [sensor] object. This object is used  ***
-*** to acquire data from the Zephyr HxM sensor.                                           ***
-*** This object receives the following arguments:                                         ***
-*** - [port] (String): IMU's serial port directory.                                       ***
-*** - [name_csv](String):Name of the File which will be used as a backup for the IMU data.***
-*** - [sample] (Float):Sampling period used for the downsampling.                         ***
-*********************************************************************************************
-*********************************************************************************************
-"""
-class EcgSensor(sensors.sensor):
-    def __init__(self, port = "/dev/rfcomm0",name_csv = "Ecg_Data.csv",sample = 1):
-        super(EcgSensor, self).__init__(sample_time = sample,name = "Ecg-thread",header_file ="fid, fiv, hid, hiv, batt, hr, hbn, hbts1, hbts2, hbts3, hbts4, hbts5, hbts6, hbts7, hbts8, hbts9, hbts10, hbts11, hbts12, hbts13, hbts14, hbts15, distance, speed, strides",file_name = name_csv)
-        #defining the serial port that will be used.
-        self.__ser=serial.Serial(port, 115200, timeout=1)
-        #Flag used to check the synchronization.
-        self.__async=False
-        #Variables used in the zephyr's serial protocol.
-        self.__stx = struct.pack("<B", 0x02)
-        self.__etx = struct.pack("<B", 0x02)
-        self.__rate = struct.pack("<B", 0x26)
-        self.__dlc_byte = struct.pack("<B", 55)
-        #Array where the EKG data will be saved.
-        self.__data_temp=[]
-        #Flag that is used in case of pause.
-        self.__pause=True
-        self.sample_time=sample
-        self.lock = threading.Lock()
-        """
-        *********************************************************************************************
-        *********************************************************************************************
-        *** Override of the [sensor]'s process method, in this case [process] is a controlled and ***
-        *** infinite loop which interacts with the serial port that is assigned after linking the ***
-        *** bluetooth devices.                                                                    ***
-        *********************************************************************************************
-        *********************************************************************************************
-        """
+class EMG_Sensor(object):
+
+    def __init__(self):
+
+        self.variablesEMG = variablesEMG.EMG_Variables()
+        self.variablesEMG.load_variables()
+
+        #Create the sockets to initiate the communication with EMG delsys system
+        #creates general connection with EMG Delsys
+        self.s1 = socket.socket()
+        self.s1.connect(('localhost', 50040))
+        #Opening the specific port to get EMG signal
+        self.s = socket.socket()
+        self.s.connect(('localhost',50041))
+        #Command to start, always ends with \r\n\r\n
+
+        self.start_command="START\r\n\r\n"
+        self.s1.sendall(self.start_command)
+
+
+        
+        
+
+        
+        
+
+        self.go_ON = False
+
     def process(self):
-        while self.go_on:
-            if not self.__pause:
-                try:
-                    d = self.__ser.read()
-                    #print(str(d))
-                    if d != self.__stx:
-                        if not self.__async:
-                            print >>sys.stderr, "Not synched"
-                            self.__async = True
-                        continue
 
-                    self.__async = False
-                    type = self.__ser.read()	# Msg ID
-                    if type != self.__rate:
-                        print >>sys.stderr, "Unknown message type"
-                    dlc = self.__ser.read()	# DLC
-                    len, = struct.unpack("<B", dlc)
-                    if len != 55:
-                        print >>sys.stderr, "Bad DLC"
-                    payload = self.__ser.read(len)
-                    crc, = struct.unpack("<B", self.__ser.read())
-                    end, = struct.unpack("<B", self.__ser.read())
-                    sum = 0
-                    #print "L: " + str(len)
+        counter = 0
+        iR = 0
+        iL = 0
+        p = 0
+        k = 1
 
-                    for i in xrange(len):
-                        b, = struct.unpack("<B", payload[i])
-                        #print "Data: 0x%02x" % b
-                        sum = (sum ^ b) & 0xff
-                        for j in xrange(8):
-                            if sum & 0x01:
-                                sum = (sum >> 1) ^ 0x8c
-                            else:
-                                sum = (sum >> 1)
-                    #print "CRC:  0x%02x" % crc
-                    if crc != sum:
-                        print >>sys.stderr, "Bad CRC: " + str(sum) + " is not " + str(crc)
-                    else:
-                        pass #print "CRC validated!"
-                    if end != 0x03:
-                        print >>sys.stderr, "Bad ETX"
+        #self.s1.send(bytes(self.start_command))
+        #print("start")
+        for i in range(1000) :
+            #Receiving info in packages of 4 BYTES so each package is an emg
+            self.variablesEMG.answer = self.s.recv(4)
+            a = struct.unpack('>f', self.variablesEMG.answer)
+            print(a)
+            #self.variablesEMG.emg0.append(a)
+            #print(self.variablesEMG.emg0)
+            
+    def start(self):
 
-                    #Saving data into the backup file.
-                    with self.lock:
-                        self.__data_temp=list(struct.unpack("<H2sH2sBBB15H6xHHB3x", payload))
-
-                    self.val=reduce(lambda a,b:str(a)+','+str(b),self.__data_temp)+'\n'
-                    self.load_data(self.val)
-                    time.sleep(self.sample_time)
-                except:
-                    print("problems with ECG acquisition ")
-                    pass
-            else:
-                time.sleep(1)
-        """
-        *********************************************************************************************
-        *********************************************************************************************
-        *** The [pause] method changes the [__pause] flag, which means that the thread will be    ***
-        *** paused until the flag is changed to a False value.                                    ***
-        *********************************************************************************************
-        *********************************************************************************************
-        """
-    def pause(self):
-        self.__pause=True
-        """
-        *********************************************************************************************
-        *********************************************************************************************
-        *** The [play] method changes the [__pause] flag, which means that the thread will run    ***
-        *** until the flag is changed to a True value.
-        *********************************************************************************************
-        *********************************************************************************************
-        """
-    def play(self):
-        self.__pause=False
-        """
-        *********************************************************************************************
-        *********************************************************************************************
-        *** The [close] method is used to close the serial port that is being used.               ***
-        *********************************************************************************************
-        *********************************************************************************************
-        """
-    def close(self):
-        self.shutdown()
-        self.__ser.close()
-        """
-        *********************************************************************************************
-        *********************************************************************************************
-        *** The [get_data] method is used to return the data collected by the Zephyr sensor.      ***
-        *********************************************************************************************
-        *********************************************************************************************
-        """
-    def get_data(self):
-        data = self.__data_temp
-        #{'hr': self.__data_temp[5]}
-        #print(data)
-        return data
-
+        self.go_ON = True
 
 
 def main():
-    ecg = EcgSensor(port = 'COM5')
-    ecg.start() 
-    ecg.play()
-    for x in range(10):
-        time.sleep(1)
-        logging.debug(ecg.get_data())
+    emg = EMG_Sensor()
+    emg.process()
 
-    ecg.shutdown()
+A= main()
 
-if __name__ == '__main__':
-    main()
+
+
+        
+
+    
+
+
+            
+
+
+
+
+        
+
+
+
+
+#if __name__ == '__main__':
+    #main()
