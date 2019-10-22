@@ -13,6 +13,7 @@ class TherapyWindow(QtGui.QMainWindow):
 
     def __init__(self):
         super(TherapyWindow,self).__init__()
+        self.Muscle = None
         self.init_ui()
          
     def init_ui(self):
@@ -189,6 +190,17 @@ class TherapyWindow(QtGui.QMainWindow):
         self.Options['read_second'].addItem("Postura")
         self.Options['read_second'].addItem("EMG") 
 
+
+        self.Options['EMG_Muscle'] = QtGui.QComboBox(self)
+        self.Options['EMG_Muscle'].setStyleSheet("font-size:27px; Arial")
+        self.Options['EMG_Muscle'].setGeometry(QtCore.QRect(self.winsize_h*0.23,self.winsize_v*0.174,self.winsize_h*0.18 ,self.winsize_h*0.02))   
+        self.Options['EMG_Muscle'].addItem("Gluteo derecho - Gluteo izquierdo")
+        self.Options['EMG_Muscle'].addItem("Quadriceps derecho - Quadriceps izquierdo")
+        self.Options['EMG_Muscle'].addItem("Triceps derecho - Triceps izquierdo")
+        self.Options['EMG_Muscle'].addItem("Hamstring derecho - Hamstring izquierdo")
+
+
+
         # Sensor labels and text
 
         self.ECG = {}
@@ -220,7 +232,7 @@ class TherapyWindow(QtGui.QMainWindow):
 
         self.EMGDisplay={}
         self.EMGDisplay['name'] = QtGui.QLabel(self)
-        self.EMGDisplay['name'].setText("Electromyography Graphic")
+        self.EMGDisplay['name'].setText("Grafica Electromiografia")
         self.EMGDisplay['name'].setStyleSheet("font-size:35px; Arial")
         self.EMGDisplay['name'].setGeometry(QtCore.QRect(self.winsize_h*0.66,self.winsize_v*0.1,self.winsize_h*0.2,self.winsize_h*0.1))
         
@@ -278,6 +290,40 @@ class TherapyWindow(QtGui.QMainWindow):
         self.SetRobot['battery'].setStyleSheet("font-size:30px; Arial")
         self.SetRobot['battery'].setGeometry(QtCore.QRect(self.winsize_h*0.26,self.winsize_v*0.62,self.winsize_h*0.25 ,self.winsize_h*0.02))
         self.SetRobot['battery'].show()
+
+    def get_OptionsData(self):
+
+       
+
+        priority1  = str(self.Options['read_first'].currentText())
+        priority2 = str(self.Options['read_second'].currentText())
+
+        if priority1 == "EMG":
+            priority1 = "EMG"
+            priority2 == "IMU"
+        elif priority1 == "IMU":
+            priority1 == "IMU"
+            priority2 =="EMG"
+
+        emgMuscle = str(self.Options['EMG_Muscle'].currentText())
+
+        self.Options['EMG_Muscle'].addItem("Gluteo derecho - Gluteo izquierdo")
+        self.Options['EMG_Muscle'].addItem("Quadriceps derecho - Quadriceps izquierdo")
+        self.Options['EMG_Muscle'].addItem("Triceps derecho - Triceps izquierdo")
+        self.Options['EMG_Muscle'].addItem("Hamstring derecho - Hamstring izquierdo")
+
+        if emgMuscle == "Gluteo derecho - Gluteo izquierdo":
+            self.Muscle = "1"
+        elif emgMuscle == "Quadriceps derecho - Quadriceps izquierdo":
+            self.Muscle = "2"
+        elif emgMuscle == "Triceps derecho - Triceps izquierdo":
+            self.Muscle = "3"
+        elif emgMuscle == "Hamstring derecho - Hamstring izquierdo":
+            self.Muscle = "4"
+  
+        self.sensors_Settings = {'priority1' : priority1,'priority2': priority2 ,'Muscle' : self.Muscle}
+
+        return(self.sensors_Settings)
 
 
 

@@ -19,10 +19,16 @@ import CpWalker_index as cp
 
 class EMG_Sensor(object):
 
-    def __init__(self):
+    def __init__(self, settings = {'MuscletoUse': None}):
+
+        #load settings
+        self.settings = settings
+        self.MuscletoUse = self.settings['MuscletoUse']
+        print(self.MuscletoUse)
 
         self.variablesEMG = variablesEMG.EMG_Variables()
         self.variablesEMG.load_variables()
+        self.phase_Gait = 0
         self.cp = cp.CpWalkerAquisition()
 
         #Create the sockets to initiate the communication with EMG delsys system
@@ -84,11 +90,9 @@ class EMG_Sensor(object):
                     print(self.variablesEMG.IndexLeft)
                     print(kleft)
                     '''
+                    self.phase_Gait = self.decidePhase(k)
 
                     
-
-
-
 
                     self.variablesEMG.RightGluteus.append(self.variablesEMG.emg0[counter][0])
                     self.variablesEMG.RightQuadriceps.append(self.variablesEMG.emg0[counter+1][0])
@@ -107,38 +111,26 @@ class EMG_Sensor(object):
                     #print('------------------')
                     
 
-                    #print(p)
-                    #print(iL)
                     if k == 200:
-                        print('here')
-                        print(len(self.variablesEMG.RightTriceps))
-                        print('here')
 
-                        p_0 = len(self.variablesEMG.RightTriceps)
-                   
-                        #self.Muscle(RightGluteus[iR:p],"RightGluteus",Index[iR:p])
-                        #self.Muscle(RightQuadriceps[iR:p],"RightQuadriceps",Index[iR:p])
-                        self.Muscle(self.variablesEMG.RightTriceps[init:p_0],"RightTriceps",self.variablesEMG.Index[init:p_0])
+                        p_0 = len(self.variablesEMG.RightGluteus)
+
+                        if (self.MuscletoUse == "1"):
+                            self.Muscle(self.variablesEMG.RightGluteus[init:p_0],"RightGluteus",self.variablesEMG.Index[init:p_0])
+                        #self.Muscle(self.variablesEMG.RightQuadriceps[init:p_0],"RightQuadriceps")
+                        #self.Muscle(self.variablesEMG.RightTriceps[init:p_0],"RightTriceps",self.variablesEMG.Index[init:p_0])
                         #self.Muscle(RightHamstrings[iR:p],"RightHamstrings",Index[iR:p])
                         init = p_0
                     
                     if kleft == 200:
                         p_1 = len(self.variablesEMG.LeftQuadriceps)
 
-                        #print('**********************************')
+                        #print('here kleft')
                         #print(len(self.variablesEMG.LeftQuadriceps))
-                       
-                        #print('--------------iL--P---------')
-                        #print(iL)
-                        #print(p)
-                        #print('-------------------------')
-                        #print(self.variablesEMG.LeftQuadriceps[iL:p])
-                        print('here kleft')
-                        print(len(self.variablesEMG.LeftQuadriceps))
-                        print('here kleft')
-
-                        #self.Muscle(LeftGluteus[iL:p],"LeftGluteus",IndexLeft[iL:p])
-                        self.Muscle(self.variablesEMG.LeftQuadriceps[init1:p_1],"LeftQuadriceps",self.variablesEMG.IndexLeft[init1:p_1])
+                        #print('here kleft')
+                        if (self.MuscletoUse == "1"):
+                            self.Muscle(self.variablesEMG.LeftGluteus[init1:p_1],"LeftGluteus",self.variablesEMG.IndexLeft[init1:p_1])
+                        #self.Muscle(self.variablesEMG.LeftQuadriceps[init1:p_1],"LeftQuadriceps", self.variablesEMG.Index[init:p_1])
                         #self.Muscle(LeftTriceps[iL:p],"LeftTriceps",IndexLeft[iL:p])
                         #self.Muscle(LeftHamstrings[iL:p],"LeftHamstrings",IndexLeft[iL:p])
 
@@ -146,7 +138,7 @@ class EMG_Sensor(object):
 
                     counter += 16
 
-                if len(self.variablesEMG.emg0) == 5000000 :
+                if len(self.variablesEMG.emg0) == 5000000:
                     print("ya")
                     break
   
@@ -195,21 +187,31 @@ class EMG_Sensor(object):
         return phase
 
 
+    def launch_EMGsensor(self):
+
+        self.p = threading.Thread(target = self.process)
+        self.p.start()
+
 
 
     def Muscle(self,emg,MuscleName, CpWalkerIndex):
         print('Muscle')
-
+        #print(len(CpWalkerIndex))
         window = signal.get_window('hann',80)
-   
         RMSemg, time = self.rollapply(emg,window, by=1, fs=1.)
         fs = 2000 
         fc = 10/(fs/2)
         b = signal.firwin(100,fc)
         self.emg_filtered = signal.lfilter(b,1,RMSemg)
         #print(self.emg_filtered)
-        decision,th = self.apply_threshold(self.emg_filtered*10000)
+        decision, contraction = self.apply_threshold(self.emg_filtered*10000)
 
+        print("Contractions in the time")
+        #print(len(decision))
+        print(decision)
+        for u in range(len(decision)):
+            if decision[u] > 0:
+                print u
 
 
     def rollapply(self,x, window, by=1, fs=1.):
@@ -269,18 +271,51 @@ class EMG_Sensor(object):
             if (((emg[k]>th) and (emg[k+1]<th)) or (((emg[k]<th) and (emg[k+1]>th)))):
                 contraction[k] = 1*th
                 print("CONTRACTION")
-            else : contraction[k] = 0 
-            
-        return contraction,th
+                self.contraction = 1
+            else : 
+                contraction[k] = 0 
+                self.contraction = 0
+         
+        return contraction, self.contraction
+
+    def muscleGaitAnalysis(self, contractionList, CpWalkerIndex, MuscleName):
+
+        self.phaseConstant = 0
+        self.phaseConstant2 = 0
+        self.contractionList = np.array(contractionList)
+        self.CpWalkerIndex = np.array(CpWalkerIndex)
+        self.contractionList.resize(self.CpWalkerIndex.shape)
+        self.maskMatrix = self.contractionList*self.CpWalkerIndex
+
+
+        # Gait Analysis
+
+        if MuscleName == "RightGluteus" or MuscleName == "LeftGluteus":
+
+            self.phaseConstant = 1
+
+        elif MuscleName == "RightHamstrings" or MuscleName =="LeftHamstrings":
+
+            self.phaseConstant = 1
+
+        elif MuscleName == "RightQuadriceps" or MuscleName == "LeftQuadriceps":
+
+            self.phaseConstant = 2
+            self.phaseConstant2= 4
+
+        elif MuscleName == "RightTriceps" or MuscleName == "LeftTriceps":
+
+            self.phaseConstant = 3
+
+        
 
 
 
 
 
-
-
+    
 def main():
-    emg = EMG_Sensor()
+    emg = EMG_Sensor(settings = {'MuscletoUse': "1"})
     emg.start()
     emg.process()
     emg.stop()
