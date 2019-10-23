@@ -152,7 +152,7 @@ class EcgSensor(sensors.sensor):
 
 
 def main():
-    ecg = EcgSensor(port = 'COM5')
+    ecg = EcgSensor(port = 'COM4')
     ecg.start() 
     ecg.play()
     for x in range(10):
@@ -160,6 +160,7 @@ def main():
         logging.debug(ecg.get_data())
 
     ecg.shutdown()
+#A= main()
 
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+    #main()
