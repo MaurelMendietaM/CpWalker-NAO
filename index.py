@@ -11,7 +11,9 @@ import threading
 import gui.IntroductionWin as Introduction   
 import gui.SettingsWin as Settings  
 import gui.PlayWin as Play
+import gui.TherapyWin as MainTherapy
 import robotController.NAO_controller as controller
+import lib.SensorManager as manager 
 from PyQt4 import QtCore, QtGui
 import time
 import sys
@@ -34,6 +36,7 @@ class NAO_CpWalker(object):
         self.settingsWin = Settings.SettingsWindow()
         self.IntroductionWin = Introduction.IntroductionWindow()
         self.PlayWin = Play.PlayWindow()
+        self.therapyWin = MainTherapy.TherapyWindow()
 
         
 
@@ -43,7 +46,8 @@ class NAO_CpWalker(object):
         #therapy win interface object
         
 
-        self.settingsWin.connectIntroductionButton(self.go_to_Introduction)    
+        self.settingsWin.connectIntroductionButton(self.go_to_Introduction) 
+        self.settingsWin.connecTherapyButton(self.start_sessionSettings)
         self.settingsWin.show()  
 
         
@@ -135,6 +139,44 @@ class NAO_CpWalker(object):
 
     def load_Speech(self):
         pass
+
+    def start_sessionSettings(self):
+        m = self.settingsWin.get_settings_data()
+
+        self.settings['RobotIp'] = m['ip']
+
+        if self.settings['UseRobot']:
+            self.RobotCaptureThread = RobotCaptureThread(interface = self)
+            self.robotController = controller.RobotController({
+                                                                 'name'       : "NAO",
+                                                                 'ip'         : self.settings['RobotIp'],
+                                                                 'port'       : self.settings['RobotPort'],
+                                                                 'UseSpanish' : True,
+                                                                 'MotivationTime': 300000000,
+                                                                 'HeartRate_Lim': 120,
+                                                                 'Cerv_Lim': 0,
+                                                                 'Thor_Lim': 0
+                                                              })
+        self.sensor_Settings()
+
+    def sensor_Settings(self):
+
+        if self.settings['UseRobot']:
+            self.therapyWin.(self.robotController.start_session)
+
+
+
+        self.SensorUpdateThread  = SensorUpdateThread(f =self.sensor_update, sample = 1)
+        self.Manager = manager.SensorManager( ecg   = {"port":'COM6', "sample":1},
+                                              EMG   = {"MuscletoUse": None})
+        if self.settings['UseSensors']:
+            
+            # set sensors
+            self.Manager.set_sensors(imu = False, joy = False, ecg=True)
+        
+
+
+
 
         
 

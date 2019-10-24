@@ -108,7 +108,7 @@ class SettingsWindow(QtGui.QMainWindow):
         self.controlButtons['Introduction'].clicked.connect(f)
 
     def connectTherapyButton(self,f):
-        self.controlButtons['Introduction'].clicked.connect(f)
+        self.controlButtons['Therapy'].clicked.connect(f)
 
     def get_settings_data(self):
 

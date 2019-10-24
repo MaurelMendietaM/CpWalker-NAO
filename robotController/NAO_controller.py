@@ -194,6 +194,15 @@ class RobotController(object):
         #self.behavior_mng_service.runBehavior(behaviors[i])
         pass
 
+    def start_session(self):
+        print('Start_session')
+        self.motion.wakeUp()
+        #self.tts.say(self.welcomeSentence)
+        #self.posture.goToPosture("StandZero", 1.0)
+        self.animatedSpeechProxy.say(self.dialogs.TherapyWelcomeSentence)
+        #print('Aqui')
+        time.sleep(3)
+
 
 
     def shutdown(self):

@@ -10,11 +10,18 @@ from pyqtgraph import PlotWidget
 class TherapyWindow(QtGui.QMainWindow):
 
     onClose = QtCore.pyqtSignal()
+    onData = QtCore.pyqtSignal()
+    onSensorUpdate = QtCore.pyqtSignal()  
 
     def __init__(self):
         super(TherapyWindow,self).__init__()
         self.Muscle = None
         self.init_ui()
+        self.dataToDisplay={'hr':0,
+                            'Inclination':0,
+                            }
+        self.set_signals()
+
          
     def init_ui(self):
         #Window Title
@@ -227,7 +234,17 @@ class TherapyWindow(QtGui.QMainWindow):
         self.controlButtons['close'] = QtGui.QCommandLinkButton(self)
         self.controlButtons['close'].setIconSize(QSize(0,0))
         self.controlButtons['close'].setGeometry(QtCore.QRect(self.winsize_h*0.93,self.winsize_v*0.05,self.winsize_h*0.045,self.winsize_h*0.045)) 
+
+        self.controlButtons['start'] = QtGui.QCommandLinkButton(self)
+        self.controlButtons['start'].setIconSize(QSize(0,0))
+        self.controlButtons['start'].setGeometry(QtCore.QRect((self.winsize_h*0.85,self.winsize_v*0.8,self.winsize_h*0.07,self.winsize_h*0.07))
+
+        self.controlButtons['stop'] = QtGui.QCommandLinkButton(self)
+        self.controlButtons['stop'].setIconSize(QSize(0,0))
+        self.controlButtons['stop'].setGeometry(QtCore.QRect(self.winsize_h*0.75,self.winsize_v*0.8,self.winsize_h*0.07,self.winsize_h*0.07)) 
         
+
+
         #Graphic Plot Widget
 
         self.EMGDisplay={}
@@ -246,12 +263,21 @@ class TherapyWindow(QtGui.QMainWindow):
        
         self.show()
 
-        self.connectCloseButton();
-        
+        self.connectCloseButton()
 
-    def connectSpeechButton(self,f):
-        self.controlButtons['speech'].clicked.connect(f) 
 
+    def connectStartButton(self, f):
+
+        self.controlButtons['start'].clicked.connect(f)
+
+    def connectStopButton(self, f):
+        self.controlButtons['start'].clicked.connect(f)
+
+    def set_signals(self):
+
+        self.onData.connect(self.display_data)
+                            
+                                            
     def connectCloseButton(self):
         self.controlButtons['close'].clicked.connect(self.close)
         self.onClose.emit()
@@ -325,6 +351,33 @@ class TherapyWindow(QtGui.QMainWindow):
 
         return(self.sensors_Settings)
 
+    def display_data(self):
+
+    
+        self.ECG['lcd'].setDigitCount(7)
+        self.ECG['lcd'].display(self.dataToDisplay['hr'])
+        self.Inclination['lcd'].setDigitCount(7)
+        self.Inclination['lcd'].display(self.dataToDisplay['yaw_t'])
+
+    def update_display_data(self,
+                            d = {
+                                'hr' : 0,
+                                'Inclination' :0
+                                }
+                            ):
+        print("ACA ESTOY")
+        self.dataToDisplay =  d
+        self.onData.emit()
+
+    def onStopClicked(self):
+        self.onStop.emit()
+        print('stop clicked')
+        self.update_display_data(d = {
+                                        'hr' : 0,
+                                        'Inclination' : 0,
+                                        }
+                                        )
+    
 
 
 
