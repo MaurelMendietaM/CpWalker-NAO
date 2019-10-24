@@ -23,7 +23,7 @@ import random
 class NAO_CpWalker(object):
     
     def __init__(self, settings = {'UseSensors': True,
-                                   'UseRobot'  : True,
+                                   'UseRobot'  : False,
                                    'RobotIp'   : "192.168.1.75.",
                                    'RobotPort' : 9559
                                    
@@ -47,7 +47,10 @@ class NAO_CpWalker(object):
         
 
         self.settingsWin.connectIntroductionButton(self.go_to_Introduction) 
-        self.settingsWin.connecTherapyButton(self.start_sessionSettings)
+        self.settingsWin.connectTherapyButton(self.start_sessionSettings)
+
+        self.therapyWin.connectStartButton(self.onStartThreads)
+        self.therapyWin.connectStopButton(self.shutdown)
         self.settingsWin.show()  
 
         
@@ -141,7 +144,9 @@ class NAO_CpWalker(object):
         pass
 
     def start_sessionSettings(self):
+    	print('Here')
         m = self.settingsWin.get_settings_data()
+        battery = "85%"
 
         self.settings['RobotIp'] = m['ip']
 
@@ -157,23 +162,53 @@ class NAO_CpWalker(object):
                                                                  'Cerv_Lim': 0,
                                                                  'Thor_Lim': 0
                                                               })
+        self.therapyWin.show()
+        self.therapyWin.sensorsData(m['ip'], battery)
+
         self.sensor_Settings()
+
+    def onStartThreads(self):
+
+    	self.SensorUpdateThread.start()
+    	self.SensorAcquisitionThread.start()
 
     def sensor_Settings(self):
 
-        if self.settings['UseRobot']:
-            self.therapyWin.(self.robotController.start_session)
-
-
-
         self.SensorUpdateThread  = SensorUpdateThread(f =self.sensor_update, sample = 1)
-        self.Manager = manager.SensorManager( ecg   = {"port":'COM6', "sample":1},
-                                              EMG   = {"MuscletoUse": None})
+
+        self.Manager = manager.SensorManager( ecg   = {"port":'COM3', "sample":1},
+                                              EMG   = {"MuscletoUse": "1"})
+
+        self.SensorAcquisitionThread = SensorAcquisitionThread(f=self.Manager.update_data, sample =1)
+
         if self.settings['UseSensors']:
             
             # set sensors
-            self.Manager.set_sensors(imu = False, joy = False, ecg=True)
+            self.Manager.set_sensors(ecg = True, emg=True)
+            self.Manager.launch_Sensors()
+            time.sleep(5)
+
+    def sensor_update(self):
+
+    	if self.settings['UseSensors']:
+    		self.data = self.Manager.get_Data()
+    		print('Index')
+    		print(self.data)
+    		self.therapyWin.update_display_data(d = { 'hr' :self.data['ecg'],
+                                                      'Inclination' : self.data['emg']['contractions']
+                                                      }
+                                    			)
+    		self.therapyWin.onSensorUpdate.emit()
+
+    	else:
+    		self.data = self.Manager.get_data()
+    		self.therapyWin.update_display_data(d = {
+                                                        'hr' :self.data['ecg'],
+                                                        'Inclination' : self.data['emg']['contractions']
+                                                      })
+    		self.therapyWin.onSensorUpdate.emit()
         
+
 
 
 
@@ -183,6 +218,8 @@ class NAO_CpWalker(object):
 
 
     def shutdown(self):
+    	self.SensorUpdateThread.shutdown()
+    	self.SensorAcquisitionThread.shutdown()
         self.robotController.shutdown()
 
 
@@ -226,8 +263,27 @@ class SensorUpdateThread(QtCore.QThread):
      def shutdown(self):
         self.ON = False
 
+class SensorAcquisitionThread(QtCore.QThread):
+
+	def __init__(self, parent = None, f = None, sample = 1):
+		super(SensorAcquisitionThread,self).__init__()
+		self.f = f
+		self.Ts = sample
+		self.ON = True
+
+	def run(self):
+		if self.f:
+			while self.ON:
+				self.f()
+				time.sleep(self.Ts)
+
+	def shutdown(self):
+		self.ON = False
+
+    #def shutdown(self):
+    	#self.ON = False
 
 if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
-    a =NAO_CpWalker()
-    sys.exit(app.exec_())
+	app = QtGui.QApplication(sys.argv)
+	a =NAO_CpWalker()
+	sys.exit(app.exec_())

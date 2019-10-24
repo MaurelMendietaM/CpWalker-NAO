@@ -7,12 +7,14 @@ import time
 import random
 
 class SensorManager(object):
-    def __init__(self, ecg   = {"port":'COM6', "sample":1},
+    def __init__(self, ecg   = {"port":'COM4', "sample":1},
                        EMG   = {"MuscletoUse": None}
                 ):
         #sensor control variable
         self.settings_emg = EMG
+
         self.settings_ecg = ecg
+        print(self.settings_ecg)
         #control variables
         self.EMG =False
         self.ECG =False
@@ -61,8 +63,8 @@ class SensorManager(object):
         if self.ECG:
             #ecg_data = self.ecg.read_data()
             ecg_data = self.ecg.get_data()
-            print('Data ecg from Manager')
-            print(ecg_data)
+            #print('Data ecg from Manager')
+            #print(ecg_data)
             if not ecg_data:
                 ecg_data = 0
 
@@ -84,6 +86,10 @@ class SensorManager(object):
     def print_data(self):
         print("DATA FROM MANAGER: " + str(self.data)) 
 
+    def get_Data(self):
+
+        return(self.data)
+
     def shutdown(self):
 
         if self.EMG:
@@ -94,8 +100,8 @@ class SensorManager(object):
 
 
 def main():
-    sm = SensorManager(ecg   = {"port":'COM6', "sample":1}, EMG = {'MuscletoUse': "1"})
-    sm.set_sensors(ecg = False, emg = True)
+    sm = SensorManager(ecg   = {"port":'COM4', "sample":1}, EMG = {'MuscletoUse': "1"})
+    sm.set_sensors(ecg = True, emg = True)
     sm.launch_Sensors()
     time.sleep(5)
     for i in range(10000):
@@ -103,7 +109,7 @@ def main():
         sm.print_data()
         time.sleep(0.5)
     emg.stop()
-A = main()
+#A = main()
 
 
    

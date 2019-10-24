@@ -41,19 +41,19 @@ class TherapyWindow(QtGui.QMainWindow):
         self.label_background=QtGui.QLabel(self)
         self.label_background.setGeometry(QtCore.QRect(0,0,self.winsize_h,self.winsize_v))
         self.label_background.setScaledContents(True)
-        self.label_background.setPixmap(QtGui.QPixmap("img/Back.png"))
+        self.label_background.setPixmap(QtGui.QPixmap("gui/img/Back.png"))
 
         #Setting Close Image 
         self.close1=QtGui.QLabel(self)
         self.close1.setGeometry(QtCore.QRect(self.winsize_h*0.93,self.winsize_v*0.05,self.winsize_h*0.045,self.winsize_h*0.045))
-        Icon1=QtGui.QPixmap("img/closebtn.PNG")
+        Icon1=QtGui.QPixmap("gui/img/closebtn.PNG")
         Icon_resize1= Icon1.scaled(self.winsize_h*0.045,self.winsize_h*0.045,QtCore.Qt.KeepAspectRatio, transformMode=QtCore.Qt.SmoothTransformation)
         self.close1.setPixmap(Icon_resize1)
 
         #Setting Robot conexions Image
         self.robot =QtGui.QLabel(self)
         self.robot.setGeometry(QtCore.QRect(self.winsize_h*0.1,self.winsize_v*0.57,self.winsize_h*0.07,self.winsize_h*0.07))
-        robot=QtGui.QPixmap("img/Nao_head.PNG")
+        robot=QtGui.QPixmap("gui/img/Nao_head.PNG")
         robot= robot.scaled(self.winsize_h*0.07,self.winsize_h*0.07,QtCore.Qt.KeepAspectRatio, transformMode=QtCore.Qt.SmoothTransformation)
         self.robot.setPixmap(robot)
 
@@ -61,7 +61,7 @@ class TherapyWindow(QtGui.QMainWindow):
 
         self.Sensors =QtGui.QLabel(self)
         self.Sensors.setGeometry(QtCore.QRect(self.winsize_h*0.1,self.winsize_v*0.69,self.winsize_h*0.07,self.winsize_h*0.07))
-        Sensors=QtGui.QPixmap("img/conex.PNG")
+        Sensors=QtGui.QPixmap("gui/img/conex.PNG")
         Sensors= Sensors.scaled(self.winsize_h*0.07,self.winsize_h*0.07,QtCore.Qt.KeepAspectRatio, transformMode=QtCore.Qt.SmoothTransformation)
         self.Sensors.setPixmap(Sensors)
 
@@ -99,13 +99,13 @@ class TherapyWindow(QtGui.QMainWindow):
 
         self.heart=QtGui.QLabel(self)
         self.heart.setGeometry(QtCore.QRect(self.winsize_h*0.05,self.winsize_v*0.33,self.winsize_h*0.04,self.winsize_h*0.04))
-        heart=QtGui.QPixmap("img/heart.PNG")
+        heart=QtGui.QPixmap("gui/img/heart.PNG")
         heart= heart.scaled(self.winsize_h*0.04,self.winsize_h*0.04,QtCore.Qt.KeepAspectRatio, transformMode=QtCore.Qt.SmoothTransformation)
         self.heart.setPixmap(heart)
 
         self.heart_label=QtGui.QLabel(self)
         self.heart_label.setGeometry(QtCore.QRect(self.winsize_h*0.24,self.winsize_v*0.34,self.winsize_h*0.25,self.winsize_h*0.03))
-        heart_label=QtGui.QPixmap("img/rect5562.PNG")
+        heart_label=QtGui.QPixmap("gui/img/rect5562.PNG")
         heart_label= heart_label.scaled(self.winsize_h*0.3,self.winsize_h*0.04,QtCore.Qt.KeepAspectRatio, transformMode=QtCore.Qt.SmoothTransformation)
         self.heart_label.setPixmap(heart_label)
 
@@ -113,7 +113,7 @@ class TherapyWindow(QtGui.QMainWindow):
 
         self.posture=QtGui.QLabel(self)
         self.posture.setGeometry(QtCore.QRect(self.winsize_h*0.05,self.winsize_v*0.43,self.winsize_h*0.04,self.winsize_h*0.04))
-        posture =QtGui.QPixmap("img/posture.PNG")
+        posture =QtGui.QPixmap("gui/img/posture.PNG")
         posture = posture.scaled(self.winsize_h*0.04,self.winsize_h*0.04,QtCore.Qt.KeepAspectRatio, transformMode=QtCore.Qt.SmoothTransformation)
         self.posture.setPixmap(posture)
 
@@ -121,13 +121,13 @@ class TherapyWindow(QtGui.QMainWindow):
 
         self.play=QtGui.QLabel(self)
         self.play.setGeometry(QtCore.QRect(self.winsize_h*0.85,self.winsize_v*0.8,self.winsize_h*0.07,self.winsize_h*0.07))
-        play =QtGui.QPixmap("img/begin.PNG")
+        play =QtGui.QPixmap("gui/img/begin.PNG")
         play = play.scaled(self.winsize_h*0.07,self.winsize_h*0.07,QtCore.Qt.KeepAspectRatio, transformMode=QtCore.Qt.SmoothTransformation)
         self.play.setPixmap(play)
 
         self.stop=QtGui.QLabel(self)
         self.stop.setGeometry(QtCore.QRect(self.winsize_h*0.75,self.winsize_v*0.8,self.winsize_h*0.07,self.winsize_h*0.07))
-        stop =QtGui.QPixmap("img/stop1.PNG")
+        stop =QtGui.QPixmap("gui/img/stop1.PNG")
         stop = stop.scaled(self.winsize_h*0.07,self.winsize_h*0.07,QtCore.Qt.KeepAspectRatio, transformMode=QtCore.Qt.SmoothTransformation)
         self.stop.setPixmap(stop)
 
@@ -137,7 +137,7 @@ class TherapyWindow(QtGui.QMainWindow):
 
         self.posture_label=QtGui.QLabel(self)
         self.posture_label.setGeometry(QtCore.QRect(self.winsize_h*0.24,self.winsize_v*0.44,self.winsize_h*0.25,self.winsize_h*0.03))
-        posture_label=QtGui.QPixmap("img/rect5562.PNG")
+        posture_label=QtGui.QPixmap("gui/img/rect5562.PNG")
         posture_label= heart_label.scaled(self.winsize_h*0.3,self.winsize_h*0.04,QtCore.Qt.KeepAspectRatio, transformMode=QtCore.Qt.SmoothTransformation)
         self.posture_label.setPixmap(posture_label)
 
@@ -237,7 +237,7 @@ class TherapyWindow(QtGui.QMainWindow):
 
         self.controlButtons['start'] = QtGui.QCommandLinkButton(self)
         self.controlButtons['start'].setIconSize(QSize(0,0))
-        self.controlButtons['start'].setGeometry(QtCore.QRect((self.winsize_h*0.85,self.winsize_v*0.8,self.winsize_h*0.07,self.winsize_h*0.07))
+        self.controlButtons['start'].setGeometry(QtCore.QRect(self.winsize_h*0.85,self.winsize_v*0.8,self.winsize_h*0.07,self.winsize_h*0.07))
 
         self.controlButtons['stop'] = QtGui.QCommandLinkButton(self)
         self.controlButtons['stop'].setIconSize(QSize(0,0))
@@ -261,7 +261,7 @@ class TherapyWindow(QtGui.QMainWindow):
 
 
        
-        self.show()
+        #self.show()
 
         self.connectCloseButton()
 
@@ -271,7 +271,7 @@ class TherapyWindow(QtGui.QMainWindow):
         self.controlButtons['start'].clicked.connect(f)
 
     def connectStopButton(self, f):
-        self.controlButtons['start'].clicked.connect(f)
+        self.controlButtons['stop'].clicked.connect(f)
 
     def set_signals(self):
 
@@ -357,7 +357,7 @@ class TherapyWindow(QtGui.QMainWindow):
         self.ECG['lcd'].setDigitCount(7)
         self.ECG['lcd'].display(self.dataToDisplay['hr'])
         self.Inclination['lcd'].setDigitCount(7)
-        self.Inclination['lcd'].display(self.dataToDisplay['yaw_t'])
+        self.Inclination['lcd'].display(self.dataToDisplay['Inclination'])
 
     def update_display_data(self,
                             d = {
@@ -386,6 +386,6 @@ def test():
     app=QtGui.QApplication(sys.argv)
     GUI=TherapyWindow()
     sys.exit(app.exec_())
-A=test()       
+#A=test()       
 
 

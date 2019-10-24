@@ -146,13 +146,14 @@ class EcgSensor(sensors.sensor):
     def get_data(self):
         data = self.__data_temp
         #{'hr': self.__data_temp[5]}
+        #print('DataAquired')
         #print(data)
         return data
 
 
 
 def main():
-    ecg = EcgSensor(port = 'COM4')
+    ecg = EcgSensor(port = 'COM3')
     ecg.start() 
     ecg.play()
     for x in range(10):
@@ -160,7 +161,6 @@ def main():
         logging.debug(ecg.get_data())
 
     ecg.shutdown()
-#A= main()
 
-#if __name__ == '__main__':
-    #main()
+if __name__ == '__main__':
+    main()
