@@ -16,6 +16,8 @@ class Dialogs(object):
 
         #First introduction
         self.WelcomeSentence = "^startTag(animations/Stand, hello) Hola, \\pau=100\\ ^waitTag(animations/Stand, hello). ^startTag(me)  Mi nombre es Nao ^waitTag(me). \\pau=50\\Como te llamas?"
+        self.TherapyWelcomeSentence = " ^startTag(animations/Stand, hello) Hola, \\pau=400\\ ^waitTag(animations/Stand, hello). ^startTag(me)  Mi nombre es Nao ^waitTag(me). ^startTag(affirmative_context) ^startTag(affirmative_context)  Te estare acompaniando en la sesion .  Estoy aqui para cuidar tus signos \\pau=100\\y ayudarte a mejorar en tu rehabilitacion.^waitTag(affirmative_context)"
+        self.sayGoodBye = "^startTag(bow) Fue un placer acompaniarte durante la sesion  ^waitTag(bow).\\pau=400\\ ^startTag(hello) Nos vemos la proxima ocasion. ^waitTag(hello) "
         
         # Listening Sentences
         #Announce sentence
@@ -26,6 +28,25 @@ class Dialogs(object):
         self.midMotivationProvided = []
         self.sentencesLateMotivation = ["Falta poco","Ya casi terminamos","Solo faltan algunos minutos","Puedes hacerlo","Que bien lo has hecho","¡Ánimo!","Lo estás haciendo muy bien","Te veo mejor "]
         self.lateMotivationProvided = []
+
+
+        self.hrIsUpSentence = 'Parece que tu ritmo cardiaco esta alta,\\pau=300\\ todo esta bien?'
+
+        #FeedbackSentences
+
+        self.RightGluteusCorrection = "Tienes que contraer mas el gluteo derecho, vamos tu puedes!"
+        self.LeftGluteusCorrection = "Tienes que contraer mas el gluteo izquierdo"
+        self.RightQuadricepsCorrection = "Usa un poco mas el quadriceps derecho"
+        self.LeftQuadricepsCorrection = "Debes contraer mas el quadriceps de la pierna izquierda"
+        self.RightTricepsCorrection = "Debes usar mas el Triceps derecho"
+        self.LeftTricepsCorrection = "Usa un poco mas el Triceps izquierdo"
+        self.RightHamstringsCorrection = "Tienes que contraer mas el musculo isquiotibial derecho"
+        self.LeftHamstringsCorrection = "Tienes que contraer mas el musculo isquiotibial izquierdo"
+
+        #CorrectionMade
+
+        self.CorrectionMade = "Eso es!, estas mejorando"
+
         #sentnece for cooldown
         self.cooldownSentence = "Has terminado, ahora puedes seguir con el enfriamiento"
         #Sentences for alert

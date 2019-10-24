@@ -204,6 +204,24 @@ class RobotController(object):
         time.sleep(3)
 
 
+    def setData(self, data):
+
+        self.ecg = data['ecg']
+        self.emg = data['ecg']
+
+        if self.ecg['hr'] > 160:
+            self.say(self.dialogs.hrIsUpSentence)
+
+        if((self.emg['MuscleName'] == "RigthGluteus") and (self.emg['Contractions'] == 0)):
+
+            print('No hay contracion del Gluteo derecho')
+
+        if((self.emg['MuscleName'] == "LeftGluteus") and (self.emg['Contractions'] == 0)):
+
+            print('No hay contracion del Gluteo izquierdo')
+
+
+
 
     def shutdown(self):
         self.animatedSpeechProxy.say(self.dialogs.ByeSentence)
@@ -217,6 +235,8 @@ class RobotController(object):
         if (self.behavior_mng_service.isBehaviorRunning('intro_yourself-883ef7/behavior_1')):
             self.behavior_mng_service.stopBehavior('intro_yourself-883ef7/behavior_1')
             #self.sound_suscriber.unsubscribe("SoundDetected")
+
+
 
 def Test():
 
